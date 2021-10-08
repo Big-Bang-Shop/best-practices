@@ -49,7 +49,263 @@
 
         <h1 class="main-title">Branch</h1>
 
-        <p>Em desenvolvimento.</p>
+        <p>
+          O objetivo desta documentação é definir uma estratégia de
+          gerenciamento de branches que ajudará o programador no processo de
+          ramificação e mesclagem, a fim de alcançar uma melhor organização e
+          entrega contínua de recursos. A estratégia a ser abordada, tem como
+          base em dois modelos:
+          <code class="highlighter-rouge">servicing and release isolation</code>
+          com controle de <code class="highlighter-rouge">hotfix</code> do
+          <a
+            href="https://qualidadeeti.wordpress.com/tag/estrategia-de-branch"
+            target="_blank"
+          >
+            Alan Carlos
+          </a>
+          e de um modelo bem conhecido abordado pelo
+          <a
+            href="https://nvie.com/posts/a-successful-git-branching-model"
+            target="_blank"
+          >
+            Vincent Driessen
+          </a>
+          .
+        </p>
+
+        <h3 class="title">Principais branches</h3>
+
+        <p>
+          O repositório central possui dois ramos (branches) principais com uma
+          vida infinita.
+        </p>
+
+        <ul>
+          <li>master/main</li>
+          <li>staging</li>
+        </ul>
+
+        <p>
+          Consideramos <code class="highlighter-rouge">master</code> como sendo
+          o branch principal no qual o código-fonte sempre reflete o estado
+          atual do servidor de produção.
+        </p>
+        <p>
+          Consideramos <code class="highlighter-rouge">staging</code> como o
+          branch principal em que o código-fonte sempre reflete um estado com as
+          alterações de desenvolvimento mais recentes a serem enviadas na
+          próxima versão. Alguns se referem a isso como "ramificação de
+          integração". As construções mais sinistras acontecem aqui.
+        </p>
+        <p>
+          Quando o código-fonte estabilizou no branch
+          <code class="highlighter-rouge">staging</code> e está pronto para ser
+          lançado, quaisquer alterações devem ser mescladas no branch
+          <code class="highlighter-rouge">master</code>. Como isso é feito em
+          detalhes, será discutido mais adiante.
+        </p>
+
+        <h3 class="title">Branches auxiliares</h3>
+
+        <p>
+          Além dos branches principal, master e staging, nosso modelo de
+          desenvolvimento usa uma variedade de branches de suporte para
+          facilitar o desenvolvimento simultâneo entre os membros da equipe que:
+        </p>
+
+        <ul>
+          <li>
+            Torna mais fácil acompanhar os novos recursos
+            <code class="highlighter-rouge">[features]</code>.
+          </li>
+          <li>
+            Prepare a entrega de uma nova versão
+            <code class="highlighter-rouge">[release]</code>.
+          </li>
+          <li>
+            Ajuda a corrigir rapidamente falhas no servidor de produção
+            <code class="highlighter-rouge">[hotfix]</code>.
+          </li>
+          <li>
+            Melhora a qualidade e legibilidade do código, o que pode ou não
+            afetar o desempenho
+            <code class="highlighter-rouge">[refactor]</code>.
+          </li>
+        </ul>
+
+        <p>
+          Ao contrário dos ramos principais, esses ramos têm uma vida útil curta
+          porque são eventualmente removidos.
+        </p>
+
+        <p>Os diferentes tipos de branches auxiliares que podemos usar são:</p>
+
+        <ul>
+          <li>Release branches.</li>
+          <li>Feature branches.</li>
+          <li>Hotfix branches.</li>
+          <li>Refactor branches.</li>
+        </ul>
+
+        <h3 class="title">Release branches</h3>
+
+        <ul>
+          <li>
+            Pode ramificar-se do <code class="highlighter-rouge">staging</code>.
+          </li>
+          <li>
+            Deve mesclar-se novamente a
+            <code class="highlighter-rouge">staging</code>.
+          </li>
+          <li>
+            Nomenclatura da branch:
+            <code class="highlighter-rouge">release/&lt;subject&gt;</code>.
+          </li>
+        </ul>
+
+        <p>
+          Os releases branches ajudam a preparar uma nova versão de produção.
+          Eles permitem pequenas correções de bugs e definição de metadados para
+          uma release (número de versão, datas de compilação, etc). Todo esse
+          trabalho em um release branch, o
+          <code class="highlighter-rouge">staging</code> fica limpo para receber
+          features da próxima grande release.
+        </p>
+
+        <p>
+          O momento chave para se criar um novo
+          <code class="highlighter-rouge">release branch</code> ramificando-se
+          do <code class="highlighter-rouge">staging</code>, é quando um feature
+          branch está em um momento desejável para entrar em produção. Todas as
+          features candidatas ao release a ser criado, devem ser integrados ao
+          <code class="highlighter-rouge">release branch</code> neste momento.
+          Já os features voltados para versões futuras devem esperar pela
+          próxima versão.
+        </p>
+
+        <h3 class="title">Feature branches</h3>
+
+        <ul>
+          <li>
+            Pode ramificar-se a partir do
+            <code class="highlighter-rouge">staging</code>.
+          </li>
+          <li>
+            Deve mesclar-se a um
+            <code class="highlighter-rouge">branch de release</code>.
+          </li>
+          <li>
+            Nomenclatura da branch:
+            <code class="highlighter-rouge"
+              >feature/&lt;squad&gt;/&lt;subject&gt;</code
+            >.
+          </li>
+        </ul>
+
+        <p>
+          Os feature branches são usados para desenvolver novos recursos para
+          uma versão próxima ou futura. Ao iniciar o desenvolvimento de uma
+          feature, a versão de destino em que esse recurso será integrado pode
+          não ser desconhecida neste ponto.
+        </p>
+
+        <p>
+          A essência de um feature branches é que ele existe enquanto a feature
+          está em desenvolvimento, nas em algum ponto é mesclado a um
+          <code class="highlighter-rouge">release branch</code> (para adicionar
+          definitivamente o novo recurso ao próximo release) ou descartado (no
+          caso de uma experiência mal sucedida).
+        </p>
+
+        <p>
+          Nota: Este branch só deve ser excluído se o recurso já estiver no
+          <code class="highlighter-rouge">staging</code>.
+        </p>
+
+        <h3 class="title">Hotfix branches</h3>
+
+        <ul>
+          <li>
+            Pode ramificar-se a partir do
+            <code class="highlighter-rouge">master</code>.
+          </li>
+          <li>
+            Deve mesclar-se novamente a branch
+            <code class="highlighter-rouge">master</code>.
+          </li>
+          <li>
+            Nomenclatura da branch:
+            <code class="highlighter-rouge">hotfix/&lt;subject&gt;</code>.
+          </li>
+        </ul>
+
+        <p>
+          Os Hotfix branches são muito semelhantes com os release branches, pois
+          também se destinam a preparar uma nova versão de produção, embora não
+          planejada. Eles surgem da necessidade de agir imediatamente após um
+          estado indesejado de uma versão de produção. Se ocorrer um erro
+          crítico em uma versão de produção, ele deve ser corrigido
+          imediatamente.
+        </p>
+
+        <p>
+          A essência é que o trabalho dos membros da equipe (no staging) possa
+          continuar enquanto outra pessoa está preparando uma solução rápida
+          para a falha em produção.
+        </p>
+
+        <p>
+          Há uma
+          <code class="highlighter-rouge">única exceção à regra aqui</code>, que
+          é
+          <code class="highlighter-rouge"
+            >se um release branch estiver em andamento</code
+          >, as alterações de hotfix devem ser incorporadas a release branch ao
+          invés do master, o que resulta a um bugfix no release branch (se o
+          master precisa desta correção de bug imediatamente e não pode esperar
+          que o release branch seja concluído, pode-se seguramente mesclar
+          também o bugfix para <code class="highlighter-rouge">master</code>).
+        </p>
+
+        <h3 class="title">Refactor branches</h3>
+
+        <ul>
+          <li>
+            Pode ramificar-se a partir do
+            <code class="highlighter-rouge">staging</code>.
+          </li>
+          <li>
+            Deve mesclar-se novamente a branch
+            <code class="highlighter-rouge">staging</code>.
+          </li>
+          <li>
+            Nomenclatura da branch:
+            <code class="highlighter-rouge">refactor/&lt;subject&gt;</code>.
+          </li>
+        </ul>
+
+        <p>
+          Os refactors branches são um tanto semelhantes aos hotfix branches,
+          com uma diferença em como eles se ramificam e se mesclam. Eles
+          permitem refatorações de código, desde que não altere nenhuma das
+          regras de negócios.
+        </p>
+
+        <p>
+          A essência de um refactor branch é a melhoria contínua de qualidade e
+          o desempenho da aplicação. Mas, deve-se estar atento as regras, sendo:
+          a permanência do funcionamento (o que funciona, deverá continuar
+          funcionando) e a imutabilidade na regra de negócios.
+        </p>
+
+        <p>
+          Assim como no hotfix branch, há uma exceção:
+          <code class="highlighter-rouge">
+            se a refatoração for referente a um feature branch
+          </code>
+          , as alterações devem se ramificar e mesclar nesse feature branch em
+          vez de staging.
+        </p>
       </section>
     </main>
 
